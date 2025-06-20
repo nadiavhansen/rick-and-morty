@@ -1,8 +1,10 @@
 package com.rickandmorty.api.model.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class LocationDTO {
 	
 	private int id;	

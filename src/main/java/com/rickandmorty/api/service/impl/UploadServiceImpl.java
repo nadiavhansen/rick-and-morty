@@ -97,4 +97,12 @@ public class UploadServiceImpl implements UploadService {
         status.setEndTime(LocalDateTime.now());
         processStatusRepository.save(status);
     }
+
+	@Override
+	public String getLastUploadedFilePath() {
+		return uploadHistoryRepository.findTopByOrderByCreatedTimestampDesc()
+        .map(UploadHistory::getFilePath)
+        .orElse(null);
+
+	}
 }

@@ -1,5 +1,7 @@
 package com.rickandmorty.api.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,17 +32,69 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
 	private final OriginRepository originRepository;
 
     public RickAndMortyApiServiceImpl(EpisodeRepository episodeRepository, 
-    		LocationRepository pointOfExistenceRepository, 
-    		CharacterRepository characterRepository,
-    		OriginRepository originRepository) {
+    		LocationRepository pointOfExistenceRepository,
+    		OriginRepository originRepository,
+    		CharacterRepository characterRepository) {
         this.episodeRepository = episodeRepository;
 		this.locationRepository = pointOfExistenceRepository;
 		this.characterRepository = characterRepository;
 		this.originRepository = originRepository;
+		
     }
 
 
     @Override
+    public Character getASingleCharacter(int id) {
+
+        return characterRepository.findById(id).orElseGet(() -> {
+            String characterUrl = "https://rickandmortyapi.com/api/character/" + id;
+            CharacterDTO dto = restTemplate.getForObject(characterUrl, CharacterDTO.class);
+
+            if (dto == null) {
+                throw new RuntimeException("Character not found for id: " + id);
+            }
+
+            // ORIGIN
+            Origin origin = null;
+            String originUrl = dto.getOrigin() != null ? dto.getOrigin().getUrl() : null;
+            if (originUrl != null && !originUrl.isEmpty()) {
+                int originId = extractIdFromUrl(originUrl);
+                origin = originRepository.findById(originId).orElseGet(() -> {
+                    Origin fetchedOrigin = restTemplate.getForObject(originUrl, Origin.class);
+                    return originRepository.save(fetchedOrigin);
+                });
+            }
+
+            // LOCATION
+            Location location = null;
+            String locationUrl = dto.getLocation() != null ? dto.getLocation().getUrl() : null;
+            if (locationUrl != null && !locationUrl.isEmpty()) {
+                int locationId = extractIdFromUrl(locationUrl);
+                location = locationRepository.findById(locationId).orElseGet(() -> {
+                    Location fetchedLocation = restTemplate.getForObject(locationUrl, Location.class);
+                    return locationRepository.save(fetchedLocation);
+                });
+            }
+
+            // CHARACTER
+            Character character = new Character();
+            character.setId(dto.getId());
+            character.setName(dto.getName());
+            character.setStatus(dto.getStatus());
+            character.setSpecies(dto.getSpecies());
+            character.setType(dto.getType());
+            character.setGender(dto.getGender());
+            character.setOrigin(origin);
+            character.setLocation(location);
+            character.setUrl(dto.getUrl());
+
+            characterRepository.save(character);
+            return character;
+        });
+    }
+
+
+    /*@Override
     public Character getASingleCharacter(int id) {
     	
     	return characterRepository.findById(id).orElseGet(() -> {
@@ -86,10 +140,44 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
 	        
 	    	});
 		
-	}
+	}*/
+    
+    @Override
+    public Episode getASingleEpisode(int id) {
+
+        String episodeUrl = "https://rickandmortyapi.com/api/episode/" + id;
+        EpisodeDTO episodeDto = restTemplate.getForObject(episodeUrl, EpisodeDTO.class);
+
+        if (episodeDto == null) {
+            throw new RuntimeException("Episode not found for id: " + id);
+        }
+
+        List<Character> characters = episodeDto.getCharacters().stream()
+            .map(url -> characterRepository.findByUrl(url)
+                .orElseGet(() -> getASingleCharacter(extractIdFromUrl(url))))
+            .toList();
+
+        Episode episode = new Episode();
+        episode.setId(episodeDto.getId());
+        episode.setName(episodeDto.getName());
+        episode.setAirDate(episodeDto.getAirDate());
+        episode.setEpisode(episodeDto.getEpisode());
+        episode.setCharacters(characters);
+        episode.setUrl(episodeDto.getUrl());
+
+        episodeRepository.save(episode);
+
+        return episode;
+    }
+    
+    private int extractIdFromUrl(String url) {
+        String[] parts = url.split("/");
+        return Integer.parseInt(parts[parts.length - 1]);
+    }
 
 
-	@Override
+
+	/*@Override
 	public Episode getASingleEpisode(int id) {
 		
 		String episodeUrl = "https://rickandmortyapi.com/api/episode/" + id;
@@ -104,13 +192,13 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
         episode.setName(episodeDto.getName());
         episode.setAirDate(episodeDto.getAirDate());
         episode.setEpisode(episodeDto.getEpisode());
-        //episode.setCharacters(episodeDto.getCharacters());
+        episode.setCharacters(episodeDto.getCharacters());
         episode.setUrl(episodeDto.getUrl());
         
         episodeRepository.save(episode);
 		
 		return episode;
-	}
+	}*/
 
 
 	@Override

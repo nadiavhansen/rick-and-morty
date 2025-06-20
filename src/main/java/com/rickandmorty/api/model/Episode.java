@@ -2,6 +2,8 @@ package com.rickandmorty.api.model;
 
 
 import java.util.List;
+
+
 import java.util.ArrayList;
 
 
