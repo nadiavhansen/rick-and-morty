@@ -31,7 +31,7 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
              CSVReader csvReader = new CSVReader(br)) {
 
             String[] fields;
-            int lineNumber = 0;
+            int rowNumber = 0;
             csvReader.readNext();
 
             List<String[]> lines = new ArrayList<>();
@@ -41,7 +41,15 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
             }
 
             for (String[] line : lines) {
-                if (line.length < 4) continue;
+            	rowNumber++;
+                if (line.length < 4) {
+                    //System.out.println("Row " + rowNumber + " ignored: insufficient number of fields.");
+                    continue;
+                }
+                if (line[0].trim().isEmpty() || line[1].trim().isEmpty() || line[3].trim().isEmpty()) {
+                    //System.out.println("Row " + rowNumber + " ignored: empty numeric field.");
+                    continue;
+                }
 
                 int episodeId = Integer.parseInt(line[0].trim());
                 int characterId = Integer.parseInt(line[1].trim());
@@ -52,12 +60,16 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
                 rickAndMortyApiService.getASingleLocation(locationId);
             }
 
-            lineNumber = 0;
+            rowNumber = 0;
             for (String[] line : lines) {
-                lineNumber++;
+                rowNumber++;
 
                 if (line.length < 4) {
-                    System.out.println("Linha " + lineNumber + " ignorada: número insuficiente de campos.");
+                    //System.out.println("Row " + rowNumber + " ignored: insufficient number of fields.");
+                    continue;
+                }
+                if (line[0].trim().isEmpty() || line[1].trim().isEmpty() || line[3].trim().isEmpty()) {
+                    //System.out.println("Row " + rowNumber + " ignored: empty numeric field.");
                     continue;
                 }
 
@@ -70,7 +82,7 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
                     episodeService.linkCharacterToEpisode(episodeId, characterId, characterName, locationId);
 
                 } catch (NumberFormatException e) {
-                    System.out.println("Erro no parse da linha " + lineNumber + ": " + e.getMessage());
+                    System.out.println("Erro no parse da linha " + rowNumber + ": " + e.getMessage());
                 }
             }
 

@@ -60,7 +60,6 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
                 throw new RuntimeException("Character not found for id: " + id);
             }
 
-            // ORIGIN
             Origin origin = null;
             String originUrl = dto.getOrigin() != null ? dto.getOrigin().getUrl() : null;
             if (originUrl != null && !originUrl.isEmpty()) {
@@ -71,7 +70,6 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
                 });
             }
 
-            // LOCATION
             Location location = null;
             String locationUrl = dto.getLocation() != null ? dto.getLocation().getUrl() : null;
             if (locationUrl != null && !locationUrl.isEmpty()) {
@@ -82,7 +80,6 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
                 });
             }
 
-            // CHARACTER
             Character character = new Character();
             character.setId(dto.getId());
             character.setName(dto.getName());
@@ -99,54 +96,6 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
         });
     }
 
-
-    /*@Override
-    public Character getASingleCharacter(int id) {
-    	
-    	return characterRepository.findById(id).orElseGet(() -> {
-	        String characterUrl = "https://rickandmortyapi.com/api/character/" + id;
-	        CharacterDTO dto = restTemplate.getForObject(characterUrl, CharacterDTO.class);
-	
-	        if (dto == null) {
-	            throw new RuntimeException("Character not found for id: " + id);
-	        }
-	
-	        Origin origin = null;
-	        if (dto.getOrigin() != null && dto.getOrigin().getUrl() != null && !dto.getOrigin().getUrl().isEmpty()) {
-	            try {
-	                origin = restTemplate.getForObject(dto.getOrigin().getUrl(), Origin.class);
-	            } catch (Exception e) {
-	                log.warn("Failed to fetch origin from URL: {}", dto.getOrigin().getUrl());
-	            }
-	        }
-	
-	        Location location = null;
-	        if (dto.getLocation() != null && dto.getLocation().getUrl() != null && !dto.getLocation().getUrl().isEmpty()) {
-	            try {
-	                location = restTemplate.getForObject(dto.getLocation().getUrl(), Location.class);
-	            } catch (Exception e) {
-	                log.warn("Failed to fetch location from URL: {}", dto.getLocation().getUrl());
-	            }
-	        }
-	
-	        Character character = new Character();
-	        character.setId(dto.getId());
-	        character.setName(dto.getName());
-	        character.setStatus(dto.getStatus());
-	        character.setSpecies(dto.getSpecies());
-	        character.setType(dto.getType());
-	        character.setGender(dto.getGender());
-	        character.setOrigin(origin);
-	        character.setLocation(location);
-	        character.setUrl(dto.getUrl());
-	        
-	        characterRepository.save(character);
-	
-	        return character;
-	        
-	    	});
-		
-	}*/
     
     @Override
     public Episode getASingleEpisode(int id) {
@@ -184,31 +133,6 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
         String[] parts = url.split("/");
         return Integer.parseInt(parts[parts.length - 1]);
     }
-
-
-
-	/*@Override
-	public Episode getASingleEpisode(int id) {
-		
-		String episodeUrl = "https://rickandmortyapi.com/api/episode/" + id;
-		EpisodeDTO episodeDto = restTemplate.getForObject(episodeUrl, EpisodeDTO.class);
-
-        if (episodeDto == null) {
-            throw new RuntimeException("Episode not found for id: " + id);
-        }
-        
-        Episode episode = new Episode();
-        episode.setId(episodeDto.getId());
-        episode.setName(episodeDto.getName());
-        episode.setAirDate(episodeDto.getAirDate());
-        episode.setEpisode(episodeDto.getEpisode());
-        episode.setCharacters(episodeDto.getCharacters());
-        episode.setUrl(episodeDto.getUrl());
-        
-        episodeRepository.save(episode);
-		
-		return episode;
-	}*/
 
 
 	@Override
