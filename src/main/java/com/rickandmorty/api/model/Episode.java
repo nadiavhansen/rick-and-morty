@@ -2,16 +2,8 @@ package com.rickandmorty.api.model;
 
 
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import java.util.ArrayList;
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,16 +22,6 @@ public class Episode {
 	private String airDate;
 	private String episode;
 	
-	/*@ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "episode_character",
-        joinColumns = @JoinColumn(name = "episode_id"),
-        inverseJoinColumns = @JoinColumn(name = "character_id")
-    )
-	@Builder.Default
-	@JsonIgnore
-	private List<Character> characters = new ArrayList<>();*/
-	
 	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable( name = "episode_character",
 	        joinColumns = @JoinColumn(name = "episode_id"),
@@ -50,7 +32,6 @@ public class Episode {
 	@EqualsAndHashCode.Exclude
 	private List<Character> characters = new ArrayList<>();
 
-	
 	private String url;
 	
 

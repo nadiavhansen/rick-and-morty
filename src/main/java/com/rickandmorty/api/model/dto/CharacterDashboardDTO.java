@@ -1,7 +1,5 @@
 package com.rickandmorty.api.model.dto;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 

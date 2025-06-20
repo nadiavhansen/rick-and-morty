@@ -43,11 +43,9 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
             for (String[] line : lines) {
             	rowNumber++;
                 if (line.length < 4) {
-                    //System.out.println("Row " + rowNumber + " ignored: insufficient number of fields.");
                     continue;
                 }
                 if (line[0].trim().isEmpty() || line[1].trim().isEmpty() || line[3].trim().isEmpty()) {
-                    //System.out.println("Row " + rowNumber + " ignored: empty numeric field.");
                     continue;
                 }
 
@@ -65,11 +63,9 @@ public class EpisodeCsvServiceImpl implements EpisodeCsvService {
                 rowNumber++;
 
                 if (line.length < 4) {
-                    //System.out.println("Row " + rowNumber + " ignored: insufficient number of fields.");
                     continue;
                 }
                 if (line[0].trim().isEmpty() || line[1].trim().isEmpty() || line[3].trim().isEmpty()) {
-                    //System.out.println("Row " + rowNumber + " ignored: empty numeric field.");
                     continue;
                 }
 

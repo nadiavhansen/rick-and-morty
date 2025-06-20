@@ -3,11 +3,7 @@ package com.rickandmorty.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +42,6 @@ public class Character {
 	@EqualsAndHashCode.Exclude
 	private List<Episode> episodes = new ArrayList<>();
 
-	
 	private String url;
 
 }

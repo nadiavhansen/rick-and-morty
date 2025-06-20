@@ -36,11 +36,6 @@ public class EpisodeController {
     public List<Episode> getAllEpisodes() {
         return episodeService.findAll();
     }
-
-    //@GetMapping("/{id}")
-    //public Episode findEpisodeById(@PathVariable int id) {
-    //    return episodeService.findById(id);
-    //}
     
     @GetMapping("/{id}")
     public Episode getEpisodeById(@PathVariable int id) {

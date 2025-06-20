@@ -14,6 +14,5 @@ public class EpisodeDashboardDTO {
 	 private String airDate;
 	 private String episode;
 	 private List<CharacterDashboardDTO> characters;
-	 private String url;
 
 }

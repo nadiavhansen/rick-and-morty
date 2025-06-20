@@ -9,5 +9,4 @@ public interface CharacterRepository extends JpaRepository<Character, Integer>{
 	
 	Optional<Character> findByUrl(String url);
 
-
 }

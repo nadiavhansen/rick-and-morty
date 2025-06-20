@@ -2,6 +2,11 @@ package com.rickandmorty.api.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.rickandmorty.api.model.Episode;
@@ -16,6 +21,7 @@ import com.rickandmorty.api.model.dto.OriginDTO;
 import com.rickandmorty.api.repository.CharacterRepository;
 import com.rickandmorty.api.repository.EpisodeRepository;
 import com.rickandmorty.api.repository.LocationRepository;
+import com.rickandmorty.api.repository.specification.EpisodeSpecification;
 import com.rickandmorty.api.service.CitadelDashboardService;
 import com.rickandmorty.api.service.UploadService;
 
@@ -104,5 +110,18 @@ public class CitadelDashboardServiceImpl implements CitadelDashboardService{
                 .dimension(origin.getDimension())
                 .build();
     }
+
+	@Override
+	public Page getDashboard(String characterName, String episodeName, String locationName, String sortBy,
+			String sortDirection, int page, int size) {
+		Specification<Episode> spec = Specification.where(EpisodeSpecification.hasEpisodeName(episodeName))
+		        .and(EpisodeSpecification.hasCharacterName(characterName))
+		        .and(EpisodeSpecification.hasLocationName(locationName));
+
+		    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+		    Pageable pageable = PageRequest.of(page, size, sort);
+
+		    return episodeRepository.findAll(spec, pageable);
+	}
 
 }

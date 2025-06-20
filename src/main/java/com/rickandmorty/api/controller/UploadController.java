@@ -1,8 +1,5 @@
 package com.rickandmorty.api.controller;
 
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,18 +37,6 @@ public class UploadController {
 	    UploadResponseDTO response = uploadService.handleFileUpload(file);
 	    return ResponseEntity.ok(response);
 	}
-
-
-	
-	/*@GetMapping("/status")
-    public ResponseEntity<?> getStatus(@RequestParam("file") String fileName) {
-        Optional<ProcessStatus> status = processStatusRepository.findByFileName(fileName);
-        if (status.isPresent()) {
-            return ResponseEntity.ok(status.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found for file: " + fileName);
-        }
-    }*/
 	
 	@GetMapping("/status")
 	public ResponseEntity<ProcessStatusDTO> getUploadStatus(@RequestParam String file) {
