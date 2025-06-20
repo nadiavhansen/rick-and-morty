@@ -3,8 +3,11 @@ package com.rickandmorty.api.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.util.ArrayList;
 
@@ -41,9 +44,10 @@ public class Episode {
 	@JoinTable( name = "episode_character",
 	        joinColumns = @JoinColumn(name = "episode_id"),
 	        inverseJoinColumns = @JoinColumn(name = "character_id"))
-	@JsonManagedReference
 	@JsonIgnore
 	@Builder.Default
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	private List<Character> characters = new ArrayList<>();
 
 	

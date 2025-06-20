@@ -1,6 +1,7 @@
 package com.rickandmorty.api.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -45,6 +46,11 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
 
     @Override
     public Character getASingleCharacter(int id) {
+    	
+    	Optional<Character> existingCharacter = characterRepository.findById(id);
+    	if (existingCharacter.isPresent()) {
+    	    return existingCharacter.get();
+    	}
 
         return characterRepository.findById(id).orElseGet(() -> {
             String characterUrl = "https://rickandmortyapi.com/api/character/" + id;
@@ -144,6 +150,10 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
     
     @Override
     public Episode getASingleEpisode(int id) {
+        Optional<Episode> existingEpisode = episodeRepository.findById(id);
+        if (existingEpisode.isPresent()) {
+            return existingEpisode.get();
+        }
 
         String episodeUrl = "https://rickandmortyapi.com/api/episode/" + id;
         EpisodeDTO episodeDto = restTemplate.getForObject(episodeUrl, EpisodeDTO.class);
@@ -203,6 +213,12 @@ public class RickAndMortyApiServiceImpl implements RickAndMortyApiService {
 
 	@Override
 	public Location getASingleLocation(int id) {
+		
+		Optional<Location> existingLocation = locationRepository.findById(id);
+		if (existingLocation.isPresent()) {
+		    return existingLocation.get();
+		}
+
 		
 		String locatioUrl = "https://rickandmortyapi.com/api/location/" + id;
 		LocationDTO locationDto = restTemplate.getForObject(locatioUrl, LocationDTO.class);

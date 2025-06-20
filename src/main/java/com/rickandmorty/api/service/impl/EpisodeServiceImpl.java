@@ -14,6 +14,8 @@ import com.rickandmorty.api.repository.LocationRepository;
 
 import com.rickandmorty.api.service.EpisodeService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class EpisodeServiceImpl implements EpisodeService{
 
@@ -45,6 +47,7 @@ public class EpisodeServiceImpl implements EpisodeService{
 		return episodeRepository.findById(id).orElseThrow(() -> new RuntimeException("Episode not found with ID: " + id));
 	}
 
+	@Transactional
 	@Override
 	public void linkCharacterToEpisode(int episodeId, int characterId, String characterName, int locationId) {
 	    Episode episode = episodeRepository.findById(episodeId)
@@ -62,16 +65,24 @@ public class EpisodeServiceImpl implements EpisodeService{
 	        character.setName(characterName);
 	    }
 
-	    if (!episode.getCharacters().contains(character)) {
-	        episode.getCharacters().add(character);
-	    }
+	    boolean episodeAlreadyLinked = character.getEpisodes()
+	        .stream()
+	        .anyMatch(e -> e.getId() == episode.getId());
 
-	    if (!character.getEpisodes().contains(episode)) {
+	    if (!episodeAlreadyLinked) {
 	        character.getEpisodes().add(episode);
 	    }
 
+	    boolean characterAlreadyLinked = episode.getCharacters()
+	        .stream()
+	        .anyMatch(c -> c.getId() == character.getId());
+
+	    if (!characterAlreadyLinked) {
+	        episode.getCharacters().add(character);
+	    }
+
 	    characterRepository.save(character);
-	    episodeRepository.save(episode);
 	}
+
 
 }
