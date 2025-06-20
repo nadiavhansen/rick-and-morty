@@ -2,6 +2,7 @@ package com.rickandmorty.api.service.impl;
 
 import com.rickandmorty.api.model.ProcessStatus;
 import com.rickandmorty.api.model.UploadHistory;
+import com.rickandmorty.api.model.dto.UploadResponseDTO;
 import com.rickandmorty.api.repository.ProcessStatusRepository;
 import com.rickandmorty.api.repository.UploadHistoryRepository;
 import com.rickandmorty.api.service.EpisodeCsvService;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,27 +33,23 @@ public class UploadServiceImpl implements UploadService {
     private final String uploadFolder = System.getProperty("user.dir") + File.separator + "uploads";
 
     @Override
-    public String handleFileUpload(MultipartFile file) {
+    public UploadResponseDTO handleFileUpload(MultipartFile file) {
         try {
-            // Cria pasta uploads se não existir
             File folder = new File(uploadFolder);
             if (!folder.exists() && !folder.mkdirs()) {
                 throw new RuntimeException("Could not create upload directory: " + folder.getAbsolutePath());
             }
 
-            // Nome único para o arquivo salvo
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             File dest = new File(uploadFolder + File.separator + fileName);
             file.transferTo(dest);
 
-            // Salva histórico
             UploadHistory history = UploadHistory.builder()
                     .filePath(dest.getAbsolutePath())
                     .createdTimestamp(LocalDateTime.now())
                     .build();
             uploadHistoryRepository.save(history);
 
-            // Salva status inicial PENDING
             ProcessStatus status = ProcessStatus.builder()
                     .startTime(LocalDateTime.now())
                     .status("PENDING")
@@ -59,11 +57,18 @@ public class UploadServiceImpl implements UploadService {
                     .fileName(fileName)
                     .build();
             processStatusRepository.save(status);
-
-            // Dispara processamento assíncrono
             processFileAsync(fileName, dest, status.getId());
+            
+            String statusUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/upload/status")
+                    .queryParam("file", fileName)
+                    .toUriString();
 
-            return fileName;
+            return UploadResponseDTO.builder()
+                    .statusUrl(statusUrl)
+                    .fileName(fileName)
+                    .message("File uploaded successfully and is being processed.")
+                    .build();
 
         } catch (IOException e) {
             throw new RuntimeException("Error trying to save the file", e);
@@ -72,25 +77,21 @@ public class UploadServiceImpl implements UploadService {
 
     @Async
     public void processFileAsync(String fileName, File file, Long statusId) {
-        // Atualiza status para PROCESSING
         ProcessStatus status = processStatusRepository.findById(statusId).orElseThrow();
         status.setStatus("PROCESSING");
         processStatusRepository.save(status);
 
         try {
             if (fileName.toLowerCase().endsWith("episodes.csv")) {
-                // Passa um FileReader para o serviço de processamento CSV
                 try (FileReader fr = new FileReader(file)) {
                     episodeCsvService.process(fr);
                 }
             } else {
-                // Processa outros arquivos normalmente
                 fileProcessingService.processFile(file.getAbsolutePath());
             }
             status.setStatus("SUCCESS");
         } catch (Exception e) {
             status.setStatus("FAILED");
-            // Opcional: log do erro
             System.err.println("Erro ao processar arquivo: " + e.getMessage());
         }
 

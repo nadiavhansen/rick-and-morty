@@ -3,6 +3,9 @@ package com.rickandmorty.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +37,11 @@ public class Character {
 	private Location location;
 	
 	@Builder.Default
-	@ManyToMany(mappedBy = "characters", cascade = CascadeType.ALL)
-    private List<Episode> episodes = new ArrayList<>();
+	@ManyToMany(mappedBy = "characters", cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@JsonBackReference
+	@JsonIgnore
+	private List<Episode> episodes = new ArrayList<>();
+
 	
 	private String url;
 

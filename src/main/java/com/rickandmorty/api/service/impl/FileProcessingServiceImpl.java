@@ -76,7 +76,6 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 			
 			log.info("Finished reading CSV. Found {} episodes.", episodeCharactersMap.size());
 			
-			// Temporário: apenas listar os episódios com seus personagens
 			episodeCharactersMap.forEach((epId, characters) -> {
 			    log.info("Processing Episode {}", epId);
 
